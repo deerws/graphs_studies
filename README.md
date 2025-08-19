@@ -1,6 +1,6 @@
 # Graph Theory Projects 📊
 
-A collection of graph theory algorithms and data structures implemented in C++ for academic coursework at Universidade Federal de Santa Catarina (UFSC).
+A collection of graph theory algorithms and data structures implemented in C++.
 
 ## 🎯 Overview
 
@@ -22,19 +22,6 @@ This repository contains implementations of fundamental graph algorithms includi
 - **Data Structures**: Hash maps, adjacency lists, priority queues
 - **Algorithms**: Graph traversal, dynamic programming, greedy algorithms
 
-## 📁 Project Structure
-
-```
-├── A1_Graph_Fundamentals/
-│   ├── grafo.hpp              # Graph class implementation
-│   ├── A1_2.cpp               # BFS algorithm
-│   ├── A1_3.cpp               # Eulerian cycle detection
-│   ├── A1_4.cpp               # Dijkstra's algorithm
-│   ├── A1_5.cpp               # Floyd-Warshall algorithm
-│   ├── Makefile               # Build configuration
-│   └── test_files/            # Sample graph data
-└── README.md
-```
 
 ## 🔧 Getting Started
 
@@ -45,29 +32,14 @@ This repository contains implementations of fundamental graph algorithms includi
 ### Compilation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/graph-theory-projects.git
-cd graph-theory-projects/A1_Graph_Fundamentals
+git clone https://github.com/deerws/graphs_studies.git
+cd part_I
 
 # Compile all programs
 make all
 
 # Or compile individually
 g++ -std=c++17 -Wall -Wextra -O2 -o A1_2 A1_2.cpp
-```
-
-### Usage
-```bash
-# Run BFS from vertex 1
-./A1_2 graph_file.net 1
-
-# Check for Eulerian cycle
-./A1_3 graph_file.net
-
-# Find shortest paths from vertex 2
-./A1_4 graph_file.net 2
-
-# Compute all-pairs shortest paths
-./A1_5 graph_file.net
 ```
 
 ## 📊 Input Format
@@ -110,13 +82,7 @@ These projects were developed as part of the **INE5413 - Graph Theory** course a
 | Dijkstra | O((V + E) log V) | O(V) | Single-source shortest paths |
 | Floyd-Warshall | O(V³) | O(V²) | All-pairs shortest paths |
 
-## 🤝 Contributing
 
-This is an academic project, but suggestions and improvements are welcome! Please feel free to:
-- Report bugs or issues
-- Suggest optimizations
-- Provide additional test cases
-- Improve documentation
 
 ## 📄 License
 
@@ -126,4 +92,3 @@ This project is developed for educational purposes as part of university coursew
 
 **Course**: INE5413 - Graph Theory  
 **Institution**: Universidade Federal de Santa Catarina (UFSC)  
-**Program**: Computer Science
