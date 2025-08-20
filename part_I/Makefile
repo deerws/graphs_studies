@@ -5,16 +5,16 @@ TARGETS = A1_2 A1_3 A1_4 A1_5
 
 all: $(TARGETS)
 
-A1_2: A1_2.cpp grafo.hpp
+A1_2: breadth-fist_search.cpp grafo.hpp
 	$(CXX) $(CXXFLAGS) -o A1_2 A1_2.cpp
 
-A1_3: A1_3.cpp grafo.hpp
+A1_3: eulerian_cycle.cpp grafo.hpp
 	$(CXX) $(CXXFLAGS) -o A1_3 A1_3.cpp
 
-A1_4: A1_4.cpp grafo.hpp
+A1_4: dijkstra_algorithm.cpp grafo.hpp
 	$(CXX) $(CXXFLAGS) -o A1_4 A1_4.cpp
 
-A1_5: A1_5.cpp grafo.hpp
+A1_5: floyd-warshall_algorithm.cpp grafo.hpp
 	$(CXX) $(CXXFLAGS) -o A1_5 A1_5.cpp
 
 clean:
