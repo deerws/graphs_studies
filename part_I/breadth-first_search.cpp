@@ -4,7 +4,6 @@
 #include <unordered_set>
 #include <vector>
 #include <algorithm>
-#include <set>
 #include "grafo.hpp"
 
 std::unordered_map<int, std::vector<int>> buscaEmLargura(const Grafo& grafo, int s) {
@@ -20,8 +19,7 @@ std::unordered_map<int, std::vector<int>> buscaEmLargura(const Grafo& grafo, int
         auto [v, nivel] = fila.front();
         fila.pop();
         
-        std::vector<int> vizs = grafo.vizinhos(v);
-        for (int vizinho : vizs) {
+        for (int vizinho : grafo.vizinhos(v)) {
             if (visitado.find(vizinho) == visitado.end()) {
                 visitado.insert(vizinho);
                 int proximo_nivel = nivel + 1;
@@ -41,12 +39,12 @@ int main(int argc, char* argv[]) {
     }
     
     std::string arquivo = argv[1];
-    int s = std::stoi(argv[2]);
+    int s = std::stoi(argv[2]); // vértice inicial (1..n, conforme arquivo)
     
     Grafo grafo(arquivo);
     auto niveis = buscaEmLargura(grafo, s);
     
-    // Ordena os níveis e imprime
+    // Ordena os níveis
     std::vector<int> niveis_ordenados;
     for (const auto& par : niveis) {
         niveis_ordenados.push_back(par.first);
