@@ -1,7 +1,7 @@
 # Graph Theory Projects 📊
 
-Implementations of classical **graph theory algorithms** and data structures in **C++17**, developed as part of the **INE5413 – Graph Theory** course at UFSC.  
-The focus is on **academic correctness, efficiency, and clarity**.
+Implementations of classical **graph theory algorithms** and data structures in **C++17**.  
+The focus is on **efficiency, and clarity**.
 
 ---
 
@@ -159,14 +159,6 @@ Arestas:
 1-2 (2)
 3-5 (3)
 ```
-
----
-
-## 🎓 Academic Context
-
-- **Course**: INE5413 – Graph Theory  
-- **Institution**: Universidade Federal de Santa Catarina (UFSC)  
-- **Purpose**: Educational and academic — not intended for production use  
 
 ---
 
