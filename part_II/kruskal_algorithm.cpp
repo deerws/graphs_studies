@@ -12,21 +12,16 @@ int main(int argc, char* argv[]) {
     }
     
     try {
-        // Carrega o grafo do arquivo
         Grafo grafo = Grafo::carregarDoArquivo(argv[1]);
         
-        // Executa o algoritmo de Kruskal para encontrar a árvore geradora mínima
         auto resultado = grafo.kruskal();
         double pesoTotal = resultado.first;
         vector<Aresta> mst = resultado.second;
         
-        // Imprime o peso total da árvore geradora mínima
         cout << fixed << setprecision(1) << pesoTotal << endl;
         
-        // Imprime as arestas da árvore geradora mínima
+        // Imprime as arestas no formato origem-destino
         for (size_t i = 0; i < mst.size(); i++) {
-            // Imprime no formato: origem-destino
-            // Soma 1 aos índices para voltar à indexação original do arquivo
             cout << mst[i].origem + 1 << "-" << mst[i].destino + 1;
             if (i < mst.size() - 1) {
                 cout << ", ";
