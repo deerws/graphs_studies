@@ -1,0 +1,316 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[portuguese]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{setspace}
+
+\geometry{a4paper, margin=2.5cm}
+
+% Configuração para código
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    breaklines=true,
+    captionpos=b,
+    language=C++,
+    morekeywords={vector, string, pair, stack}
+}
+
+\begin{document}
+
+% ============= CAPA =============
+\begin{titlepage}
+\begin{center}
+\vspace*{-0.5cm}
+\begin{minipage}{0.15\textwidth}
+    \includegraphics[width=\textwidth]{ufsc_logo.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.6\textwidth}
+    \begin{center}
+        \textbf{UNIVERSIDADE FEDERAL DE SANTA CATARINA\\
+        DEPARTAMENTO DE INFORMÁTICA E ESTATÍSTICA\\
+        CIÊNCIAS DA COMPUTAÇÃO}
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}{0.15\textwidth}
+    \includegraphics[width=\textwidth]{ufsc_logo.png}
+\end{minipage}
+
+\vspace{5cm}
+
+\begin{center}
+{\large \textbf{INE5413 - Grafos\\
+Relatório: Atividade A2\\}}
+(\today)
+\end{center}
+
+\vspace{5cm}
+
+\begin{center}
+{\large André Pinheiro Paes}
+\end{center}
+
+\end{center}
+\end{titlepage}
+
+% ============= INÍCIO DO CONTEÚDO =============
+
+\section{Introdução}
+
+Este relatório possui intuíto de descrever a implementação de três algoritmos importantes na compreensão da teoria dos grafos, em C++ iremos desenvolver os seguintes algoritmos:
+
+\begin{itemize}
+    \item \textbf{Componentes Fortemente Conexas}
+    \item \textbf{Ordenação Topológica}
+    \item \textbf{Árvore Geradora Mínima}
+\end{itemize}
+
+Os algoritmos foram implementados utilizando uma biblioteca de grafos customizada, seguindo os princípios de eficiência computacional e boas práticas de programação.
+
+\section{Biblioteca de Grafos}
+
+\subsection{Estrutura Geral}
+
+A biblioteca foi implementada no arquivo \texttt{Grafo.hpp} e utiliza a representação:
+
+\begin{itemize}
+    \item \textbf{Lista de Adjacência}: \texttt{vector<vector<pair<int, double>>>}
+    \item \textbf{Rótulos}: \texttt{vector<string>}
+    \item \textbf{Atributos}: número de vértices, direcionamento e ponderação
+\end{itemize}
+
+\subsection{Justificativa}
+
+\begin{enumerate}
+    \item \textbf{Eficiência espacial}: Para grafos onde $|E| \ll |V|^2$, a lista de adjacência utiliza $O(V + E)$ espaço, enquanto uma matriz de adjacência utilizaria $O(V^2)$.
+    
+    \item \textbf{Eficiência temporal}: A iteração sobre os vizinhos de um vértice é $O(grau(v))$, enquanto em uma matriz seria $O(V)$.
+    
+    \item \textbf{Flexibilidade}: A estrutura " \texttt{pair<int, double>} " permite armazenar tanto o vértice adjacente quanto o peso da aresta, o que facilita a ponderabilidade.
+\end{enumerate}
+
+\section{Componentes Fortemente Conexas}
+
+\subsection{Descrição do Algoritmo}
+
+O Algoritmo de Kosaraju foi implementado para encontrar componentes fortemente conexas em grafos dirigidos. Uma componente fortemente conexa é um subconjunto maximal de vértices onde existe um caminho de qualquer vértice para qualquer outro vértice dentro do conjunto.
+
+\subsection{Implementação}
+
+O algoritmo foi implementado em três etapas:
+
+\begin{enumerate}
+    \item \textbf{Primeira DFS}: Realiza uma busca em profundidade no grafo original, armazenando os vértices em uma pilha na ordem de finalização.
+    
+    \item \textbf{Transposição}: Cria o grafo transposto $G^T$, invertendo a direção de todas as arestas.
+    
+    \item \textbf{Segunda DFS}: Executa DFS no grafo transposto, processando os vértices na ordem da pilha. Cada árvore DFS resultante é uma componente fortemente conexa.
+\end{enumerate}
+
+\subsection{Estruturas de Dados Utilizadas}
+
+\begin{itemize}
+    \item \textbf{Pilha} (\texttt{stack<int>}): Armazena a ordem de finalização da primeira DFS. A escolha da pilha garante que processamos os vértices na ordem LIFO (Last In, First Out), essencial para o algoritmo de Kosaraju.
+    
+    \item \textbf{Vector de Booleanos} (\texttt{vector<bool>}): Marca vértices visitados durante as travessias. Proporciona acesso em $O(1)$ e utiliza apenas 1 bit por elemento.
+    
+    \item \textbf{Grafo Transposto} (\texttt{vector<vector<int>>}): Representação simplificada do grafo com arestas invertidas, criado em $O(V + E)$.
+\end{itemize}
+
+\subsection{Complexidade}
+
+\begin{itemize}
+    \item \textbf{Temporal}: $O(V + E)$ - Cada vértice e aresta é visitado um número constante de vezes.
+    \item \textbf{Espacial}: $O(V + E)$ - Para armazenar o grafo original, transposto e estruturas auxiliares.
+\end{itemize}
+
+\subsection{Justificativa das Escolhas}
+
+O algoritmo de Kosaraju foi escolhido por sua simplicidade de implementação e complexidade temporal ótima $O(V + E)$. A pilha é essencial para manter a ordem correta de processamento dos vértices, garantindo que as componentes sejam identificadas corretamente. A lista de adjacência permite iteração eficiente sobre os vizinhos durante as travessias DFS.
+
+\section{Ordenação Topológica}
+
+\subsection{Descrição do Algoritmo}
+
+A ordenação topológica é uma ordenação linear dos vértices de um grafo acíclico dirigido (DAG) tal que, para toda aresta $(u, v)$, o vértice $u$ aparece antes de $v$ na ordenação.
+
+\subsection{Implementação}
+
+O algoritmo foi implementado utilizando DFS modificada:
+
+\begin{enumerate}
+    \item Executa DFS a partir de cada vértice não visitado
+    \item Quando um vértice finaliza sua exploração, ele é empilhado
+    \item Ao desempilhar os vértices, obtém-se a ordem topológica
+\end{enumerate}
+
+\subsection{Estruturas de Dados Utilizadas}
+
+\begin{itemize}
+    \item \textbf{Pilha} (\texttt{stack<int>}): Armazena os vértices na ordem inversa de finalização. Ao desempilhar, obtemos a ordem topológica correta.
+    
+    \item \textbf{Vector de Booleanos} (\texttt{vector<bool>}): Controla vértices já visitados, evitando processamento duplicado.
+    
+    \item \textbf{Vector de Strings} (\texttt{vector<string>}): Armazena os rótulos dos vértices para exibição legível da ordenação.
+\end{itemize}
+
+\subsection{Complexidade}
+
+\begin{itemize}
+    \item \textbf{Temporal}: $O(V + E)$ - Cada vértice e aresta é visitado exatamente uma vez.
+    \item \textbf{Espacial}: $O(V)$ - Para a pilha e o vetor de visitados.
+\end{itemize}
+
+\subsection{Justificativa das Escolhas}
+
+A abordagem baseada em DFS tem complexidade $O(V + E)$ e é particularmente elegante: os vértices são adicionados à pilha quando sua DFS finaliza, garantindo que um vértice só apareça na ordenação depois de todos os seus sucessores. A lista de adjacência permite percorrer eficientemente os vizinhos durante a DFS, tornando o algoritmo eficiente mesmo para grafos grandes.
+
+\subsection{Aplicações Práticas}
+
+A ordenação topológica tem diversas aplicações práticas:
+
+\begin{itemize}
+    \item Resolução de dependências em sistemas de build
+    \item Agendamento de tarefas com precedência
+    \item Determinação de ordem de execução de disciplinas (pré-requisitos)
+    \item Análise de redes de Petri
+\end{itemize}
+
+\section{Árvore Geradora Mínima - Kruskal}
+
+\subsection{Descrição do Algoritmo}
+
+O Algoritmo de Kruskal encontra uma árvore geradora mínima (MST) em um grafo conexo, não-dirigido e ponderado. Uma MST é um subconjunto de arestas que conecta todos os vértices com o menor peso total possível, sem formar ciclos.
+
+\subsection{Implementação}
+
+O algoritmo segue a estratégia gulosa:
+
+\begin{enumerate}
+    \item Ordena todas as arestas por peso crescente
+    \item Para cada aresta $(u, v)$, em ordem:
+    \begin{itemize}
+        \item Se $u$ e $v$ estão em componentes diferentes, adiciona a aresta à MST
+        \item Une as componentes de $u$ e $v$
+    \end{itemize}
+    \item Para quando houver $V-1$ arestas na MST
+\end{enumerate}
+
+\subsection{Estruturas de Dados Utilizadas}
+
+\begin{itemize}
+    \item \textbf{Vector de Arestas} (\texttt{vector<Aresta>}): Armazena todas as arestas do grafo. Permite ordenação eficiente usando \texttt{std::sort}.
+    
+    \item \textbf{Union-Find} (\texttt{vector<int>}): Estrutura de dados disjunta (Disjoint Set) que mantém componentes conectadas. Implementado com:
+    \begin{itemize}
+        \item \textbf{Compressão de caminho}: Na operação \texttt{find()}, todos os nós no caminho apontam diretamente para a raiz.
+        \item \textbf{Complexidade amortizada}: Praticamente $O(\alpha(n))$, onde $\alpha$ é a função inversa de Ackermann (aproximadamente constante).
+    \end{itemize}
+    
+    \item \textbf{Set} (\texttt{set<pair<int, int>>}): Evita duplicação de arestas em grafos não-dirigidos durante a extração das arestas.
+\end{itemize}
+
+\subsection{Complexidade}
+
+\begin{itemize}
+    \item \textbf{Temporal}: $O(E \log E)$ - Dominado pela ordenação das arestas. As operações Union-Find são praticamente constantes.
+    \item \textbf{Espacial}: $O(V + E)$ - Para armazenar o grafo e a estrutura Union-Find.
+\end{itemize}
+
+\subsection{Justificativa das Escolhas}
+
+O algoritmo de Kruskal foi escolhido pela sua eficiência em grafos esparsos e pela facilidade de implementação. Sua complexidade $O(E \log E)$ é dominada pela ordenação das arestas. A estrutura Union-Find permite verificações de ciclos em tempo quase constante (amortizado), tornando o algoritmo muito eficiente. A ordenação prévia das arestas garante que sempre adicionamos a menor aresta possível que não forma ciclo, seguindo a estratégia gulosa ótima.
+
+\subsection{Vantagens do Kruskal}
+
+\begin{itemize}
+    \item Eficiente para grafos esparsos ($E \approx V$)
+    \item Implementação relativamente simples
+    \item Funciona bem com estrutura Union-Find otimizada
+    \item Adequado para processamento distribuído (arestas podem ser processadas independentemente após ordenação)
+\end{itemize}
+
+\section{Formato de Entrada}
+
+Todos os programas aceitam arquivos no formato Pajek (.net), estruturados da seguinte forma:
+
+\begin{lstlisting}[caption=Formato do arquivo de entrada]
+*vertices n
+1 rotulo_vertice_1
+2 rotulo_vertice_2
+...
+n rotulo_vertice_n
+*edges     (ou *arcs para grafos dirigidos)
+origem destino peso
+...
+\end{lstlisting}
+
+\section{Resultados e Testes}
+
+\subsection{Componentes Fortemente Conexas}
+
+Para um grafo dirigido com 7 vértices e as seguintes arestas: $(1,2), (2,6), (2,3), (3,4), (4,5), (5,3), (6,7), (7,6)$, o programa identificou corretamente duas componentes:
+
+\begin{itemize}
+    \item Componente 1: $\{3, 4, 5\}$
+    \item Componente 2: $\{1, 2, 6, 7\}$
+\end{itemize}
+
+\subsection{Ordenação Topológica}
+
+Para um grafo representando uma rotina matinal com 15 atividades em sequência, o programa produziu a ordenação correta respeitando todas as dependências estabelecidas.
+
+\subsection{Árvore Geradora Mínima}
+
+Para um grafo não-dirigido com 6 vértices e arestas ponderadas, o algoritmo de Kruskal encontrou a MST com peso total de 22.0, contendo as arestas: $(6,5), (1,2), (3,4), (4,1), (5,2)$.
+
+\section{Conclusões}
+
+Este projeto permitiu o aprofundamento no estudo de algoritmos clássicos em grafos e suas implementações eficientes. As principais conclusões são:
+
+\begin{enumerate}
+    \item A escolha adequada de estruturas de dados é fundamental para a eficiência dos algoritmos. A lista de adjacência mostrou-se versátil para os três problemas implementados.
+    
+    \item Estruturas auxiliares como pilhas e Union-Find são essenciais para implementações eficientes de algoritmos em grafos.
+    
+    \item Todos os algoritmos implementados atingem complexidades temporais ótimas ou próximas do ótimo:
+    \begin{itemize}
+        \item Kosaraju: $O(V + E)$
+        \item Ordenação Topológica: $O(V + E)$
+        \item Kruskal: $O(E \log E)$
+    \end{itemize}
+    
+    \item A modularização do código através de uma biblioteca reutilizável facilita a implementação de múltiplos algoritmos e futuras extensões.
+    
+    \item Os testes realizados confirmaram a corretude das implementações para diversos casos de entrada.
+\end{enumerate}
+
+\subsection{Trabalhos Futuros}
+
+Possíveis extensões deste projeto incluem:
+
+\begin{itemize}
+    \item Implementação de algoritmos de caminho mínimo (Dijkstra, Bellman-Ford)
+    \item Adição do algoritmo de Prim para comparação com Kruskal
+    \item Implementação de algoritmos de fluxo máximo
+    \item Otimização da estrutura Union-Find com union by rank
+    \item Desenvolvimento de interface gráfica para visualização dos grafos
+    \item Análise experimental comparativa de desempenho com grafos de diferentes tamanhos
+\end{itemize}
+
+
+\end{document}
