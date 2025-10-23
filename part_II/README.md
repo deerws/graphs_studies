@@ -4,7 +4,7 @@ Study project implementing fundamental graph algorithms in C++.
 
 ## Project Structure
 
-- `Grafo.hpp` - Graph library with all necessary functionalities
+- `grafo.hpp` - Graph library with all necessary functionalities
 - `strongly_connected_components_SCCs.cpp` - Program to find strongly connected components
 - `topological_sort.cpp` - Program for topological sorting
 - `kruskal_algorithm.cpp` - Program for minimum spanning tree (Kruskal's algorithm)
