@@ -1,5 +1,6 @@
 #include <iostream>
-#include "Grafo.h"
+#include <algorithm>
+#include "grafo.hpp"
 
 using namespace std;
 
@@ -9,24 +10,22 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    try {
-        Grafo grafo = Grafo::carregarDoArquivo(argv[1]);
-        vector<vector<int>> componentes = grafo.componentesFortementeConexas();
+    string nomeArquivo = argv[1];
+    Grafo g = Grafo::lerArquivo(nomeArquivo);
+
+    vector<vector<int>> componentes = g.componentesFortementeConexas();
+    
+    for (const auto& componente : componentes) {
+        vector<int> comp = componente;
+        sort(comp.begin(), comp.end());
         
-        // Imprime as componentes
-        for (size_t i = 0; i < componentes.size(); i++) {
-            for (size_t j = 0; j < componentes[i].size(); j++) {
-                cout << componentes[i][j] + 1; // índice do vértice
-                if (j < componentes[i].size() - 1) {
-                    cout << ",";
-                }
+        for (size_t i = 0; i < comp.size(); i++) {
+            cout << (comp[i] + 1);
+            if (i < comp.size() - 1) {
+                cout << ",";
             }
-            cout << endl;
         }
-        
-    } catch (const exception& e) {
-        cerr << "Erro: " << e.what() << endl;
-        return 1;
+        cout << endl;
     }
     
     return 0;
