@@ -57,62 +57,7 @@ private:
         return false;
     }
     
-    // BFS para Hopcroft-Karp
-    bool bfsHK(const vector<int>& pairU, const vector<int>& pairV, 
-               vector<int>& dist, int n1) {
-        queue<int> q;
-        
-        for (int u = 0; u < n1; u++) {
-            if (pairU[u] == -1) {
-                dist[u] = 0;
-                q.push(u);
-            } else {
-                dist[u] = INT_MAX;
-            }
-        }
-        
-        dist[numVertices] = INT_MAX;
-        
-        while (!q.empty()) {
-            int u = q.front();
-            q.pop();
-            
-            if (dist[u] < dist[numVertices]) {
-                for (const auto& aresta : listaAdj[u]) {
-                    int v = aresta.destino;
-                    
-                    if (dist[pairV[v]] == INT_MAX) {
-                        dist[pairV[v]] = dist[u] + 1;
-                        q.push(pairV[v]);
-                    }
-                }
-            }
-        }
-        
-        return dist[numVertices] != INT_MAX;
-    }
-    
-    // DFS para Hopcroft-Karp
-    bool dfsHK(int u, const vector<int>& pairU, vector<int>& pairV, 
-               vector<int>& dist) {
-        if (u != numVertices) {
-            for (const auto& aresta : listaAdj[u]) {
-                int v = aresta.destino;
-                
-                if (dist[pairV[v]] == dist[u] + 1) {
-                    if (dfsHK(pairV[v], pairU, pairV, dist)) {
-                        pairV[v] = u;
-                        const_cast<vector<int>&>(pairU)[u] = v;
-                        return true;
-                    }
-                }
-            }
-            
-            dist[u] = INT_MAX;
-            return false;
-        }
-        return true;
-    }
+
 
 public:
     Grafo(int n, bool dir = false, bool pond = false) 
@@ -187,17 +132,85 @@ public:
     
     // Algoritmo de Hopcroft-Karp
     pair<int, vector<pair<int, int>>> hopcroftKarp(int n1) {
-        vector<int> pairU(numVertices + 1, -1);
-        vector<int> pairV(numVertices + 1, -1);
-        vector<int> dist(numVertices + 1);
+        int n2 = numVertices - n1;
+        vector<int> pairU(n1, -1);
+        vector<int> pairV(n2, -1);
+        vector<int> dist(n1 + 1);
         
         int matching = 0;
         
-        while (bfsHK(pairU, pairV, dist, n1)) {
+        // BFS e DFS alternados
+        while (true) {
+            // BFS
+            queue<int> q;
             for (int u = 0; u < n1; u++) {
                 if (pairU[u] == -1) {
-                    if (dfsHK(u, pairU, pairV, dist)) {
-                        matching++;
+                    dist[u] = 0;
+                    q.push(u);
+                } else {
+                    dist[u] = INT_MAX;
+                }
+            }
+            dist[n1] = INT_MAX; // NIL
+            
+            bool found = false;
+            while (!q.empty()) {
+                int u = q.front();
+                q.pop();
+                
+                if (dist[u] < dist[n1]) {
+                    for (const auto& aresta : listaAdj[u]) {
+                        int v = aresta.destino - n1; // Ajustar para índice da segunda partição
+                        
+                        if (v >= 0 && v < n2) {
+                            int nextU = pairV[v];
+                            if (nextU == -1) {
+                                dist[n1] = dist[u] + 1;
+                                found = true;
+                            } else if (dist[nextU] == INT_MAX) {
+                                dist[nextU] = dist[u] + 1;
+                                q.push(nextU);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (!found) break;
+            
+            // DFS
+            for (int u = 0; u < n1; u++) {
+                if (pairU[u] == -1) {
+                    // DFS inline
+                    stack<int> dfsStack;
+                    dfsStack.push(u);
+                    vector<bool> visited(n1, false);
+                    
+                    while (!dfsStack.empty()) {
+                        int curr = dfsStack.top();
+                        dfsStack.pop();
+                        
+                        if (visited[curr]) continue;
+                        visited[curr] = true;
+                        
+                        for (const auto& aresta : listaAdj[curr]) {
+                            int v = aresta.destino - n1;
+                            
+                            if (v >= 0 && v < n2) {
+                                if (pairV[v] == -1) {
+                                    // Caminho aumentante encontrado
+                                    pairV[v] = curr;
+                                    pairU[curr] = v + n1;
+                                    matching++;
+                                    break;
+                                } else {
+                                    int nextU = pairV[v];
+                                    if (dist[nextU] == dist[curr] + 1 && !visited[nextU]) {
+                                        dfsStack.push(nextU);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
