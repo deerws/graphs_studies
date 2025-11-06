@@ -130,96 +130,55 @@ public:
         return fluxoMaximo;
     }
     
-    // Algoritmo de Hopcroft-Karp
-    pair<int, vector<pair<int, int>>> hopcroftKarp(int n1) {
-        int n2 = numVertices - n1;
-        vector<int> pairU(n1, -1);
-        vector<int> pairV(n2, -1);
-        vector<int> dist(n1 + 1);
-        
-        int matching = 0;
-        
-        // BFS e DFS alternados
-        while (true) {
-            // BFS
-            queue<int> q;
-            for (int u = 0; u < n1; u++) {
-                if (pairU[u] == -1) {
-                    dist[u] = 0;
-                    q.push(u);
-                } else {
-                    dist[u] = INT_MAX;
-                }
-            }
-            dist[n1] = INT_MAX; // NIL
+    // DFS para encontrar caminho aumentante
+    bool dfsAumentante(int u, vector<bool>& visitado, vector<int>& matchU, 
+                       vector<int>& matchV, int n1) {
+        for (const auto& aresta : listaAdj[u]) {
+            int v = aresta.destino;
             
-            bool found = false;
-            while (!q.empty()) {
-                int u = q.front();
-                q.pop();
+            // v deve estar na segunda partição
+            if (v >= n1 && v < numVertices) {
+                int v_idx = v - n1;
                 
-                if (dist[u] < dist[n1]) {
-                    for (const auto& aresta : listaAdj[u]) {
-                        int v = aresta.destino - n1; // Ajustar para índice da segunda partição
-                        
-                        if (v >= 0 && v < n2) {
-                            int nextU = pairV[v];
-                            if (nextU == -1) {
-                                dist[n1] = dist[u] + 1;
-                                found = true;
-                            } else if (dist[nextU] == INT_MAX) {
-                                dist[nextU] = dist[u] + 1;
-                                q.push(nextU);
-                            }
-                        }
-                    }
-                }
-            }
-            
-            if (!found) break;
-            
-            // DFS
-            for (int u = 0; u < n1; u++) {
-                if (pairU[u] == -1) {
-                    // DFS inline
-                    stack<int> dfsStack;
-                    dfsStack.push(u);
-                    vector<bool> visited(n1, false);
+                if (!visitado[v_idx]) {
+                    visitado[v_idx] = true;
                     
-                    while (!dfsStack.empty()) {
-                        int curr = dfsStack.top();
-                        dfsStack.pop();
-                        
-                        if (visited[curr]) continue;
-                        visited[curr] = true;
-                        
-                        for (const auto& aresta : listaAdj[curr]) {
-                            int v = aresta.destino - n1;
-                            
-                            if (v >= 0 && v < n2) {
-                                if (pairV[v] == -1) {
-                                    // Caminho aumentante encontrado
-                                    pairV[v] = curr;
-                                    pairU[curr] = v + n1;
-                                    matching++;
-                                    break;
-                                } else {
-                                    int nextU = pairV[v];
-                                    if (dist[nextU] == dist[curr] + 1 && !visited[nextU]) {
-                                        dfsStack.push(nextU);
-                                    }
-                                }
-                            }
-                        }
+                    // Se v não está emparelhado ou podemos redirecionar seu par
+                    if (matchV[v_idx] == -1 || 
+                        dfsAumentante(matchV[v_idx], visitado, matchU, matchV, n1)) {
+                        matchU[u] = v;
+                        matchV[v_idx] = u;
+                        return true;
                     }
                 }
             }
         }
+        return false;
+    }
+    
+    // Algoritmo de Hopcroft-Karp (implementação com caminhos aumentantes)
+    pair<int, vector<pair<int, int>>> hopcroftKarp(int n1) {
+        int n2 = numVertices - n1;
+        vector<int> matchU(n1, -1);
+        vector<int> matchV(n2, -1);
         
+        int matching = 0;
+        
+        // Para cada vértice na primeira partição
+        for (int u = 0; u < n1; u++) {
+            vector<bool> visitado(n2, false);
+            
+            // Tentar encontrar caminho aumentante
+            if (dfsAumentante(u, visitado, matchU, matchV, n1)) {
+                matching++;
+            }
+        }
+        
+        // Construir lista de arestas do emparelhamento
         vector<pair<int, int>> arestas;
         for (int u = 0; u < n1; u++) {
-            if (pairU[u] != -1) {
-                arestas.push_back(make_pair(u, pairU[u]));
+            if (matchU[u] != -1) {
+                arestas.push_back(make_pair(u, matchU[u]));
             }
         }
         
